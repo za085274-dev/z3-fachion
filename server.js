@@ -239,7 +239,19 @@ if (req.body.receipt) {
 });
 
 // ── SPA fallback ─────────────────────────────────────────────────────────────
-  app.get("/api/admin/orders", (req, res) => {
+  app.put("/api/admin/orders/:orderId/ship", (req, res) => {
+  try {
+    const db = readDB();
+    const order = db.orders?.find(o => o.orderId === req.params.orderId);
+    if (!order) return res.status(404).json({ success: false });
+    order.status = 'shipped';
+    writeDB(db);
+    res.json({ success: true });
+  } catch(err) {
+    res.status(500).json({ success: false });
+  }
+});
+app.get("/api/admin/orders", (req, res) => {
   try {
     const db = readDB();
     res.json({ success: true, data: db.orders || [] });

@@ -201,7 +201,7 @@ function apiFetch(path, opts = {}) {
 loadAdminProducts();
 </script>
 <div style="max-width:1200px;margin:40px auto;padding:0 20px">
-  <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;margin-bottom:24px">Talabat</h2>
+<h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;margin-bottom:24px">الطلبات <span id="orders-count" style="font-size:16px;color:var(--accent)"></span></h2>
   <div id="orders-list">
     <div class="loading-overlay"><div class="spinner"></div></div>
   </div>
@@ -213,6 +213,7 @@ async function loadOrders() {
     const res = await fetch('/api/admin/orders');
     const { data } = await res.json();
     const list = document.getElementById('orders-list');
+    document.getElementById('orders-count').textContent = `(${data.length})`;
     if (!data || data.length === 0) {
       list.innerHTML = '<p style="color:var(--warm-gray)">مفيش طلبات لسه.</p>';
       return;
@@ -228,6 +229,7 @@ async function loadOrders() {
         <div style="font-size:14px;margin-bottom:8px"><strong>الإجمالي:</strong> ${o.total} جنيه</div>
         <div style="font-size:13px;color:var(--warm-gray)">
           ${o.items.map(i => `${i.name} × ${i.quantity}`).join(' — ')}
+          <div style="margin-top:12px"><span style="font-size:12px;padding:4px 12px;background:${o.status==='shipped'?'#2d7a4f':'#e8a020'};color:white">${o.status==='shipped'?'✓ تم الشحن':'⏳ قيد الانتظار'}</span> ${o.status!=='shipped'?`<button onclick="markShipped('${o.orderId}')" style="font-size:11px;padding:4px 12px;border:1px solid #2d7a4f;color:#2d7a4f;background:none;cursor:pointer">تحديد كمشحون</button>`:''}</div>
 ${o.receipt ? `<div style="margin-top:12px"><p style="font-size:12px;color:var(--warm-gray);margin-bottom:6px">إيصال التحويل:</p><img src="${o.receipt}" style="max-width:200px;max-height:200px;object-fit:contain;border:1px solid var(--light-gray)"></div>` : ''}
         </div>
       </div>
@@ -236,6 +238,14 @@ ${o.receipt ? `<div style="margin-top:12px"><p style="font-size:12px;color:var(-
     document.getElementById('orders-list').innerHTML = '<p style="color:var(--error)">حصل خطأ</p>';
   }
 }
+async function markShipped(orderId) {
+  try {
+    await fetch(`/api/admin/orders/${orderId}/ship`, { method: 'PUT' });
+    loadOrders();
+  } catch(e) {
+    alert('حصل خطأ');
+  }
+}تم
 loadOrders();
 </script>
 </body>
