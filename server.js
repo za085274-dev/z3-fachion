@@ -217,17 +217,7 @@ if (req.body.receipt) {
     }
     const orderId = "ORD-" + uuidv4().slice(0, 8).toUpperCase();
     if (!db.orders) db.orders = [];
-    db.orders.unshift({
-      orderId,
-      name: req.body.name,
-      email: req.body.email,
-      address: req.body.address,
-      items: db.cart,
-      total: db.cart.reduce((s, i) => s + i.price * i.quantity, 0),
-      date: new Date().toISOString(),
-      status: "pending",
-receipt: receiptUrl
-    });
+    
     const order = {
       orderId,
       name: req.body.name,
