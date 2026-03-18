@@ -231,6 +231,14 @@ app.post("/api/checkout", (req, res) => {
 });
 
 // ── SPA fallback ─────────────────────────────────────────────────────────────
+  app.get("/api/admin/orders", (req, res) => {
+  try {
+    const db = readDB();
+    res.json({ success: true, data: db.orders || [] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to fetch orders" });
+  }
+});    
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "index.html"));
 });
