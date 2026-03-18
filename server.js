@@ -1,4 +1,10 @@
 const express = require("express");
+const cloudinary = require('cloudinary').v2;
+cloudinary.config({
+  cloud_name: 'dibfumcwx',
+  api_key: '937116717249724',
+  api_secret: 'trc-RTeHn0JK1K88a8CHllvLbWY'
+});
 const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
@@ -188,8 +194,19 @@ app.delete("/api/cart", (req, res) => {
 });
 
 // ── Checkout ─────────────────────────────────────────────────────────────────
-app.post("/api/checkout", (req, res) => {
+app.post("/api/checkout", async (req, res) => {
   try {
+    let receiptUrl = null;
+if (req.body.receipt) {
+  try {
+    const uploaded = await cloudinary.uploader.upload(req.body.receipt, {
+      folder: 'z3-fachion/receipts'
+    });
+    receiptUrl = uploaded.secure_url;
+  } catch(e) {
+    console.error('Cloudinary upload failed:', e);
+  }
+}
     const { name, email, address, city, zip, country, cardNumber } = req.body;
     if (!name || !email || !address) {
       return res.status(400).json({ success: false, message: "Missing required fields" });
@@ -209,7 +226,7 @@ app.post("/api/checkout", (req, res) => {
       total: db.cart.reduce((s, i) => s + i.price * i.quantity, 0),
       date: new Date().toISOString(),
       status: "pending",
-receipt: req.body.receipt || null
+receipt: receiptUrl
     });
     const order = {
       orderId,
