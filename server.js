@@ -208,7 +208,8 @@ app.post("/api/checkout", (req, res) => {
       items: db.cart,
       total: db.cart.reduce((s, i) => s + i.price * i.quantity, 0),
       date: new Date().toISOString(),
-      status: "pending"
+      status: "pending",
+receipt: req.body.receipt || null
     });
     const order = {
       orderId,

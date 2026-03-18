@@ -141,7 +141,8 @@ function renderCheckout({ items, total }) {
             <p style="font-size:24px;font-weight:500;letter-spacing:4px;color:var(--accent);margin-bottom:16px">01210597124</p>
             <div class="form-group full">
               <label>ارفع صورة إيصال التحويل</label>
-              <input type="file" id="receipt" accept="image/*" style="padding:8px;border:1px solid var(--light-gray);width:100%">
+              <input <input type="file" id="receipt" accept="image/*" style="padding:8px;border:1px solid var(--light-gray);width:100%" onchange="previewReceipt(this)">
+<img id="receipt-preview" style="display:none;width:100%;margin-top:10px;max-height:200px;object-fit:contain"> accept="image/*" style="padding:8px;border:1px solid var(--light-gray);width:100%">
             </div>
           </div>
         </div>
@@ -208,11 +209,21 @@ async function placeOrder() {
   btn.disabled = true; btn.textContent = 'جاري التأكيد…';
 
   try {
+    let receiptBase64 = null;
+const receiptFile = document.getElementById('receipt')?.files[0];
+if (receiptFile) {
+  receiptBase64 = await new Promise(res => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.readAsDataURL(receiptFile);
+  });
+}
     const { data } = await api.checkout({
       name: `${firstName} ${lastName}`,
       email: phone1 + '@z3fachion.com',
       address: `${address}، ${detail} — ${gov}`,
       country: 'EG',
+      receipt: receiptBase64,
     });
 
     document.getElementById('checkout-content').innerHTML = `
