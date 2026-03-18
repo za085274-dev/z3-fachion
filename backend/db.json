@@ -1,0 +1,81 @@
+{
+  "products": [
+    {
+      "id": "prod-001",
+      "name": "Essential White Tee",
+      "price": 350,
+      "category": "T-Shirts",
+      "description": "Our signature heavyweight cotton tee. Cut from 100% organic ring-spun cotton with a relaxed, slightly oversized silhouette. A wardrobe cornerstone that only gets better with time.",
+      "details": [
+        "100% Organic Ring-Spun Cotton",
+        "280gsm heavyweight fabric",
+        "Relaxed oversized fit",
+        "Reinforced shoulder seams",
+        "Pre-washed for minimal shrinkage"
+      ],
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ],
+      "colors": [
+        "White",
+        "Black",
+        "Stone"
+      ],
+      "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80",
+        "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80"
+      ],
+      "stock": 50,
+      "featured": true,
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "prod-aa078d12",
+      "name": "socks",
+      "price": 40,
+      "category": "e.g sokcs",
+      "description": "",
+      "details": [],
+      "sizes": [
+        "one size"
+      ],
+      "colors": [
+        "white",
+        "black"
+      ],
+      "image": "https://ar-ae.sssports.com/dw/image/v2/BDVB_PRD/on/demandware.static/-/Sites-akeneo-master-catalog/default/dw9648647b/sss/SSS2/A/D/H/T/3/SSS2_ADHT3446_4066746348680_1.jpg?sw=400&sh=400&sm=fit",
+      "images": [],
+      "stock": 25,
+      "featured": true,
+      "createdAt": "2026-03-17T14:41:02.199Z"
+    }
+  ],
+  "cart": [
+    {
+      "key": "prod-aa078d12-one size-black",
+      "productId": "prod-aa078d12",
+      "name": "socks",
+      "price": 40,
+      "image": "https://ar-ae.sssports.com/dw/image/v2/BDVB_PRD/on/demandware.static/-/Sites-akeneo-master-catalog/default/dw9648647b/sss/SSS2/A/D/H/T/3/SSS2_ADHT3446_4066746348680_1.jpg?sw=400&sh=400&sm=fit",
+      "size": "one size",
+      "color": "black",
+      "quantity": 1
+    },
+    {
+      "key": "prod-aa078d12-one size-white",
+      "productId": "prod-aa078d12",
+      "name": "socks",
+      "price": 40,
+      "image": "https://ar-ae.sssports.com/dw/image/v2/BDVB_PRD/on/demandware.static/-/Sites-akeneo-master-catalog/default/dw9648647b/sss/SSS2/A/D/H/T/3/SSS2_ADHT3446_4066746348680_1.jpg?sw=400&sh=400&sm=fit",
+      "size": "one size",
+      "color": "white",
+      "quantity": 1
+    }
+  ]
+}

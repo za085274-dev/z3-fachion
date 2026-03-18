@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — z_3CH</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: var(--cream); }
+    .admin-wrap { max-width: 1200px; margin: 0 auto; padding: 40px var(--gutter); }
+  </style>
+</head>
+<body>
+
+<div class="admin-header">
+  <h1>z_3CH Admin</h1>
+  <a href="/" style="font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(245,242,237,0.6)">
+    ← Back to Store
+  </a>
+</div>
+
+<div class="admin-wrap">
+  <div class="admin-layout">
+
+    <!-- Add Product Form -->
+    <div class="admin-form">
+      <h2>Add New Product</h2>
+      <div id="admin-msg" style="margin-bottom:16px"></div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" id="a-name" placeholder="e.g. Classic Oxford Shirt">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Price ($) *</label>
+            <input type="number" id="a-price" placeholder="89.00" min="0" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>Category *</label>
+            <input type="text" id="a-category" placeholder="e.g. Shirts">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="a-desc" placeholder="Short product description">
+        </div>
+        <div class="form-group">
+          <label>Image URL</label>
+          <input type="text" id="a-image" placeholder="https://images.unsplash.com/…">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Sizes (comma-separated)</label>
+            <input type="text" id="a-sizes" placeholder="XS, S, M, L, XL" value="XS, S, M, L, XL">
+          </div>
+          <div class="form-group">
+            <label>Colors (comma-separated)</label>
+            <input type="text" id="a-colors" placeholder="White, Black, Navy">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Product Details (comma-separated)</label>
+          <input type="text" id="a-details" placeholder="100% Cotton, Machine wash cold">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Stock Quantity</label>
+            <input type="number" id="a-stock" placeholder="25" value="25" min="0">
+          </div>
+          <div class="form-group" style="justify-content:flex-end">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:auto;padding-bottom:12px">
+              <input type="checkbox" id="a-featured"> Featured product
+            </label>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="addProduct()" id="add-product-btn">
+          Add Product
+        </button>
+      </div>
+    </div>
+
+    <!-- Product List -->
+    <div class="admin-products">
+      <h2>Current Products</h2>
+      <div id="admin-product-list">
+        <div class="loading-overlay"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/js/main.js"></script>
+<script>
+async function loadAdminProducts() {
+  try {
+    const { data } = await api.getProducts();
+    const list = document.getElementById('admin-product-list');
+    if (data.length === 0) {
+      list.innerHTML = '<p style="color:var(--warm-gray)">No products yet.</p>';
+      return;
+    }
+    list.innerHTML = data.map(p => `
+      <div class="admin-product-row">
+        <img src="${p.image}" alt="${p.name}" onerror="this.style.background='#e0dcd8'">
+        <div class="admin-product-row-info">
+          <div class="name">${p.name}</div>
+          <div class="price">${p.category} · ${fmt(p.price)} · Stock: ${p.stock}</div>
+          <div style="font-size:11px;color:var(--mid-gray);margin-top:2px">${p.id}</div>
+        </div>
+        <button class="delete-btn" onclick="deleteProduct('${p.id}', this)">Delete</button>
+      </div>
+    `).join('');
+  } catch (err) {
+    document.getElementById('admin-product-list').innerHTML =
+      `<p style="color:var(--error)">${err.message}</p>`;
+  }
+}
+
+async function addProduct() {
+  const name     = document.getElementById('a-name').value.trim();
+  const price    = document.getElementById('a-price').value;
+  const category = document.getElementById('a-category').value.trim();
+  const desc     = document.getElementById('a-desc').value.trim();
+  const image    = document.getElementById('a-image').value.trim();
+  const sizesRaw = document.getElementById('a-sizes').value;
+  const colorsRaw= document.getElementById('a-colors').value;
+  const detailsRaw = document.getElementById('a-details').value;
+  const stock    = document.getElementById('a-stock').value;
+  const featured = document.getElementById('a-featured').checked;
+
+  if (!name || !price || !category) {
+    document.getElementById('admin-msg').innerHTML =
+      '<div class="error-msg">Name, price and category are required.</div>';
+    return;
+  }
+
+  const btn = document.getElementById('add-product-btn');
+  btn.disabled = true; btn.textContent = 'Adding…';
+
+  try {
+    await apiFetch('/admin/products', {
+      method: 'POST',
+      body: JSON.stringify({
+        name, price: parseFloat(price), category, description: desc,
+        image: image || undefined,
+        sizes: sizesRaw ? sizesRaw.split(',').map(s => s.trim()).filter(Boolean) : [],
+        colors: colorsRaw ? colorsRaw.split(',').map(c => c.trim()).filter(Boolean) : [],
+        details: detailsRaw ? detailsRaw.split(',').map(d => d.trim()).filter(Boolean) : [],
+        stock: parseInt(stock) || 10,
+        featured,
+      })
+    });
+    document.getElementById('admin-msg').innerHTML =
+      '<div class="success-msg">✓ Product added successfully!</div>';
+    // Clear form
+    ['a-name','a-price','a-category','a-desc','a-image','a-colors','a-details'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('a-sizes').value = 'XS, S, M, L, XL';
+    document.getElementById('a-stock').value = '25';
+    document.getElementById('a-featured').checked = false;
+    loadAdminProducts();
+    setTimeout(() => document.getElementById('admin-msg').innerHTML = '', 4000);
+  } catch (err) {
+    document.getElementById('admin-msg').innerHTML =
+      `<div class="error-msg">${err.message}</div>`;
+  }
+
+  btn.disabled = false; btn.textContent = 'Add Product';
+}
+
+async function deleteProduct(id, btn) {
+  if (!confirm('Delete this product?')) return;
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    await apiFetch(`/admin/products/${id}`, { method: 'DELETE' });
+    loadAdminProducts();
+    showToast('Product deleted');
+  } catch (err) {
+    showToast(err.message, '✕');
+    btn.disabled = false; btn.textContent = 'Delete';
+  }
+}
+
+// Expose apiFetch globally for admin page
+function apiFetch(path, opts = {}) {
+  return fetch('/api' + path, { headers: { 'Content-Type': 'application/json' }, ...opts })
+    .then(r => r.json().then(d => { if (!r.ok) throw new Error(d.message); return d; }));
+}
+
+loadAdminProducts();
+</script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Bag — z_3CH</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">z_3<span>CH</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/pages/products.html">Shop</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="/pages/cart.html">
+      <button class="cart-btn">Bag <span class="cart-count">0</span></button>
+    </a>
+    <button class="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-nav">
+  <a href="/">Home</a>
+  <a href="/pages/products.html">Shop</a>
+  <a href="/pages/cart.html">Cart</a>
+</div>
+
+<main class="page">
+  <div class="container">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a href="/">Home</a><span>/</span><span>Your Bag</span>
+      </div>
+      <h1 class="display-md">Your Bag</h1>
+    </div>
+
+    <div id="cart-content">
+      <div class="loading-overlay"><div class="spinner"></div></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="nav-logo">z_3<span style="color:var(--accent)">CH</span></span>
+      <p>Modern essentials for the considered wardrobe.</p>
+    </div>
+    <div class="footer-col"><h5>Shop</h5><a href="/pages/products.html">All Products</a></div>
+    <div class="footer-col"><h5>Help</h5><a href="#">Returns</a></div>
+    <div class="footer-col"><h5>Company</h5><a href="/pages/admin.html">Admin</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2025 z_3CH.</span></div>
+</footer>
+
+<script src="/js/main.js"></script>
+<script>
+async function loadCart() {
+  try {
+    const { data } = await api.getCart();
+    renderCart(data);
+  } catch (err) {
+    document.getElementById('cart-content').innerHTML =
+      `<p style="color:var(--error);padding:40px 0">${err.message}</p>`;
+  }
+}
+
+function renderCart({ items, total, count }) {
+  if (items.length === 0) {
+    document.getElementById('cart-content').innerHTML = `
+      <div class="cart-empty">
+        <div class="cart-empty-icon">◻</div>
+        <h3>Your bag is empty</h3>
+        <p>Looks like you haven't added anything yet.</p>
+        <a href="/pages/products.html" class="btn btn-primary">Start Shopping</a>
+      </div>`;
+    return;
+  }
+
+  const shipping = total >= 100 ? 0 : 8;
+  const grandTotal = (total + shipping).toFixed(2);
+
+  document.getElementById('cart-content').innerHTML = `
+    <div class="cart-layout">
+      <!-- Items -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <p class="label">${count} item${count !== 1 ? 's' : ''}</p>
+          <button class="remove-btn" onclick="clearCart()">Clear all</button>
+        </div>
+        <div class="cart-items" id="cart-items">
+          ${items.map(item => cartItemHTML(item)).join('')}
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="order-summary">
+        <h3>Order Summary</h3>
+        <div class="summary-row"><span>Subtotal</span><span>${fmt(total)}</span></div>
+        <div class="summary-row">
+          <span>Shipping</span>
+          <span>${shipping === 0 ? '<span style="color:var(--success)">Free</span>' : fmt(shipping)}</span>
+        </div>
+        ${shipping > 0 ? `<p style="font-size:11px;color:var(--warm-gray);margin-top:-4px">Add ${fmt(100 - total)} more for free shipping</p>` : ''}
+        <div class="summary-row total"><span>Total</span><span>${fmt(grandTotal)}</span></div>
+        <a href="/pages/checkout.html" class="btn btn-primary btn-full" style="margin-top:20px">
+          Proceed to Checkout
+        </a>
+        <a href="/pages/products.html" class="btn btn-ghost btn-full" style="margin-top:8px">
+          Continue Shopping
+        </a>
+        <div style="margin-top:20px;text-align:center">
+          <p style="font-size:11px;color:var(--warm-gray);letter-spacing:0.08em">
+            FREE RETURNS · SECURE CHECKOUT
+          </p>
+        </div>
+      </div>
+    </div>`;
+}
+
+function cartItemHTML(item) {
+  return `
+    <div class="cart-item" id="item-${item.key.replace(/[^a-z0-9]/gi, '_')}">
+      <div class="cart-item-img">
+        <img src="${item.image}" alt="${item.name}" loading="lazy">
+      </div>
+      <div class="cart-item-info">
+        <div>
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-meta">
+            <span>Size: ${item.size}</span>
+            ${item.color ? `<span>Color: ${item.color}</span>` : ''}
+          </div>
+          <div class="qty-control">
+            <button class="qty-btn" onclick="updateQty('${item.key}', ${item.quantity - 1})">−</button>
+            <span class="qty-value">${item.quantity}</span>
+            <button class="qty-btn" onclick="updateQty('${item.key}', ${item.quantity + 1})">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="cart-item-price">
+        <span class="cart-item-total">${fmt(item.price * item.quantity)}</span>
+        <button class="remove-btn" onclick="removeItem('${item.key}')">Remove</button>
+      </div>
+    </div>`;
+}
+
+async function updateQty(key, qty) {
+  try {
+    const { data } = await api.updateCartItem(key, qty);
+    renderCart(data);
+    updateCartCount();
+  } catch (err) { showToast(err.message, '✕'); }
+}
+
+async function removeItem(key) {
+  try {
+    const { data } = await api.removeCartItem(key);
+    renderCart(data);
+    updateCartCount();
+    showToast('Item removed');
+  } catch (err) { showToast(err.message, '✕'); }
+}
+
+async function clearCart() {
+  if (!confirm('Remove all items from your bag?')) return;
+  try {
+    const { data } = await api.clearCart();
+    renderCart(data);
+    updateCartCount();
+  } catch (err) { showToast(err.message, '✕'); }
+}
+
+loadCart();
+</script>
+</body>
+</html>

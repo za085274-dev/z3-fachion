@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — Z3 Fachion</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">Z3 <span>Fachion</span></a>
+  <div class="nav-actions">
+    <a href="/pages/cart.html">
+      <button class="cart-btn">Bag <span class="cart-count">0</span></button>
+    </a>
+  </div>
+</nav>
+
+<main class="page">
+  <div class="container">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a href="/">Home</a><span>/</span>
+        <a href="/pages/cart.html">Bag</a><span>/</span>
+        <span>Checkout</span>
+      </div>
+      <h1 class="display-md">Checkout</h1>
+    </div>
+
+    <div id="checkout-content">
+      <div class="loading-overlay"><div class="spinner"></div></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-bottom" style="max-width:var(--max-w);margin:0 auto;padding:24px var(--gutter)">
+    <span>© 2025 Z3 Fachion.</span>
+  </div>
+</footer>
+
+<script src="/js/main.js"></script>
+<script>
+async function loadCheckout() {
+  try {
+    const { data } = await api.getCart();
+    if (data.items.length === 0) {
+      window.location.href = '/pages/cart.html';
+      return;
+    }
+    renderCheckout(data);
+  } catch (err) {
+    document.getElementById('checkout-content').innerHTML =
+      `<p style="color:var(--error)">${err.message}</p>`;
+  }
+}
+
+function renderCheckout({ items, total }) {
+  const shipping = total >= 100 ? 0 : 8;
+  const grandTotal = (total + shipping).toFixed(2);
+
+  document.getElementById('checkout-content').innerHTML = `
+    <div class="checkout-layout">
+      <!-- Form -->
+      <div class="checkout-form">
+
+        <div class="form-section">
+          <h3>بيانات التوصيل</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>الاسم الأول</label>
+              <input type="text" id="firstName" placeholder="محمد">
+            </div>
+            <div class="form-group">
+              <label>الاسم الأخير</label>
+              <input type="text" id="lastName" placeholder="أحمد">
+            </div>
+          </div>
+          <div class="form-group full">
+            <label>المحافظة</label>
+            <select id="governorate">
+              <option value="">اختر المحافظة</option>
+              <option>القاهرة</option>
+              <option>الجيزة</option>
+              <option>الإسكندرية</option>
+              <option>الدقهلية</option>
+              <option>البحيرة</option>
+              <option>الفيوم</option>
+              <option>الغربية</option>
+              <option>الإسماعيلية</option>
+              <option>المنوفية</option>
+              <option>المنيا</option>
+              <option>القليوبية</option>
+              <option>الوادي الجديد</option>
+              <option>السويس</option>
+              <option>أسوان</option>
+              <option>أسيوط</option>
+              <option>بني سويف</option>
+              <option>بورسعيد</option>
+              <option>دمياط</option>
+              <option>الشرقية</option>
+              <option>جنوب سيناء</option>
+              <option>كفر الشيخ</option>
+              <option>مطروح</option>
+              <option>الأقصر</option>
+              <option>قنا</option>
+              <option>شمال سيناء</option>
+              <option>سوهاج</option>
+              <option>البحر الأحمر</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>العنوان</label>
+            <input type="text" id="address" placeholder="مثال: شارع التحرير، المعادي">
+          </div>
+          <div class="form-group full">
+            <label>العنوان التفصيلي</label>
+            <input type="text" id="addressDetail" placeholder="مثال: عمارة 5، شقة 3، بجوار المسجد">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>رقم موبايل</label>
+              <input type="tel" id="phone1" placeholder="01XXXXXXXXX">
+            </div>
+            <div class="form-group">
+              <label>رقم موبايل بديل (اختياري)</label>
+              <input type="tel" id="phone2" placeholder="01XXXXXXXXX">
+            </div>
+          </div>
+        </div>
+
+        <!-- Vodafone Cash -->
+        <div class="form-section">
+          <h3>الدفع</h3>
+          <div style="background:var(--bone);padding:20px;margin-bottom:20px;border-left:3px solid var(--accent)">
+            <p style="font-size:14px;color:var(--warm-gray);margin-bottom:12px">
+              ادفع <strong style="color:var(--ink)">100 جنيه</strong> مقدم عن طريق فودافون كاش، والباقي عند الاستلام
+            </p>
+            <p style="font-size:13px;color:var(--warm-gray);margin-bottom:6px">حول على الرقم:</p>
+            <p style="font-size:24px;font-weight:500;letter-spacing:4px;color:var(--accent);margin-bottom:16px">01210597124</p>
+            <div class="form-group full">
+              <label>ارفع صورة إيصال التحويل</label>
+              <input type="file" id="receipt" accept="image/*" style="padding:8px;border:1px solid var(--light-gray);width:100%">
+            </div>
+          </div>
+        </div>
+
+        <div id="checkout-msg"></div>
+
+        <button class="btn btn-accent btn-full" id="place-btn" onclick="placeOrder()" style="font-size:14px;padding:18px">
+          تأكيد الطلب — ${fmt(grandTotal)}
+        </button>
+        <p style="font-size:11px;color:var(--warm-gray);text-align:center;margin-top:12px">
+          🔒 بياناتك آمنة ومحمية
+        </p>
+      </div>
+
+      <!-- Summary -->
+      <div class="checkout-summary">
+        <h3>ملخص الطلب</h3>
+        <div id="checkout-items">
+          ${items.map(item => `
+            <div class="checkout-item">
+              <div class="checkout-item-img" style="position:relative">
+                <img src="${item.image}" alt="${item.name}">
+                <span class="checkout-item-qty">${item.quantity}</span>
+              </div>
+              <div>
+                <div class="checkout-item-name">${item.name}</div>
+                <div class="checkout-item-meta">Size: ${item.size}${item.color ? ` · ${item.color}` : ''}</div>
+              </div>
+              <div class="checkout-item-price">${fmt(item.price * item.quantity)}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div style="margin-top:16px">
+          <div class="summary-row"><span>المجموع</span><span>${fmt(total)}</span></div>
+          <div class="summary-row">
+            <span>الشحن</span>
+            <span>${shipping === 0 ? '<span style="color:var(--success)">مجاني</span>' : fmt(shipping)}</span>
+          </div>
+          <div class="summary-row total"><span>الإجمالي</span><span>${fmt(grandTotal)}</span></div>
+          <div style="margin-top:16px;padding:12px;background:var(--bone);font-size:13px;color:var(--warm-gray)">
+            المدفوع الآن: <strong style="color:var(--accent)">100 جنيه</strong><br>
+            الباقي عند الاستلام: <strong style="color:var(--ink)">${fmt(Math.max(0, grandTotal - 100))}</strong>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function placeOrder() {
+  const firstName = document.getElementById('firstName')?.value?.trim();
+  const lastName  = document.getElementById('lastName')?.value?.trim();
+  const gov       = document.getElementById('governorate')?.value;
+  const address   = document.getElementById('address')?.value?.trim();
+  const detail    = document.getElementById('addressDetail')?.value?.trim();
+  const phone1    = document.getElementById('phone1')?.value?.trim();
+
+  if (!firstName || !gov || !address || !phone1) {
+    document.getElementById('checkout-msg').innerHTML =
+      '<div class="error-msg" style="margin-bottom:16px">من فضلك املأ كل البيانات المطلوبة</div>';
+    return;
+  }
+
+  const btn = document.getElementById('place-btn');
+  btn.disabled = true; btn.textContent = 'جاري التأكيد…';
+
+  try {
+    const { data } = await api.checkout({
+      name: `${firstName} ${lastName}`,
+      email: phone1 + '@z3fachion.com',
+      address: `${address}، ${detail} — ${gov}`,
+      country: 'EG',
+    });
+
+    document.getElementById('checkout-content').innerHTML = `
+      <div class="order-success">
+        <div class="success-icon">✓</div>
+        <h2>تم تأكيد طلبك!</h2>
+        <p>شكراً لك! سيتم التواصل معك على <strong>${phone1}</strong> لتأكيد موعد التوصيل.</p>
+        <div class="order-id">${data.orderId}</div>
+        <a href="/pages/products.html" class="btn btn-primary">متابعة التسوق</a>
+      </div>`;
+
+    updateCartCount();
+  } catch (err) {
+    document.getElementById('checkout-msg').innerHTML =
+      `<div class="error-msg" style="margin-bottom:16px">${err.message}</div>`;
+    btn.disabled = false;
+    btn.textContent = 'تأكيد الطلب';
+  }
+}
+
+loadCheckout();
+</script>
+</body>
+</html>

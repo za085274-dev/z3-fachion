@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product — z_3CH</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">z_3<span>CH</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/pages/products.html">Shop</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="/pages/cart.html">
+      <button class="cart-btn">Bag <span class="cart-count">0</span></button>
+    </a>
+    <button class="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-nav">
+  <a href="/">Home</a>
+  <a href="/pages/products.html">Shop</a>
+  <a href="/pages/cart.html">Cart</a>
+</div>
+
+<main class="page">
+  <div class="container">
+    <div class="page-header" style="padding-bottom:28px;margin-bottom:40px">
+      <div class="breadcrumb">
+        <a href="/">Home</a><span>/</span>
+        <a href="/pages/products.html">Shop</a><span>/</span>
+        <span id="breadcrumb-name">…</span>
+      </div>
+    </div>
+
+    <div id="product-content">
+      <!-- Loading skeleton -->
+      <div class="product-detail">
+        <div>
+          <div class="skeleton" style="width:100%;aspect-ratio:3/4;margin-bottom:12px"></div>
+          <div style="display:flex;gap:8px">
+            <div class="skeleton" style="width:80px;height:100px"></div>
+            <div class="skeleton" style="width:80px;height:100px"></div>
+          </div>
+        </div>
+        <div>
+          <div class="skeleton" style="height:48px;margin-bottom:12px;width:80%"></div>
+          <div class="skeleton" style="height:28px;margin-bottom:28px;width:30%"></div>
+          <div class="skeleton" style="height:120px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="nav-logo">z_3<span style="color:var(--accent)">CH</span></span>
+      <p>Modern essentials for the considered wardrobe.</p>
+    </div>
+    <div class="footer-col"><h5>Shop</h5><a href="/pages/products.html">All Products</a></div>
+    <div class="footer-col"><h5>Help</h5><a href="#">Returns</a><a href="#">Size Guide</a></div>
+    <div class="footer-col"><h5>Company</h5><a href="/pages/admin.html">Admin</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2025 z_3CH.</span></div>
+</footer>
+
+<script src="/js/main.js"></script>
+<script>
+let selectedSize = null;
+let selectedColor = null;
+let product = null;
+
+function selectSize(size, btn) {
+  selectedSize = size;
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  clearMsg();
+}
+
+function selectColor(color, btn) {
+  selectedColor = color;
+  document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function switchImage(src, thumb) {
+  document.getElementById('main-img').src = src;
+  document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+  thumb.classList.add('active');
+}
+
+function clearMsg() {
+  document.getElementById('add-msg').innerHTML = '';
+}
+
+async function addToCart() {
+  if (!selectedSize) {
+    document.getElementById('add-msg').innerHTML = '<div class="error-msg">Please select a size</div>';
+    return;
+  }
+  const btn = document.getElementById('add-btn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  btn.textContent = '';
+  try {
+    await api.addToCart({
+      productId: product.id,
+      size: selectedSize,
+      color: selectedColor || null,
+      quantity: 1,
+    });
+    document.getElementById('add-msg').innerHTML = '<div class="success-msg">✓ Added to cart!</div>';
+    updateCartCount();
+    showToast(`${product.name} (${selectedSize}) added to bag`);
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    btn.textContent = 'Add to Bag';
+    // bump cart count anim
+    document.querySelectorAll('.cart-count').forEach(el => {
+      el.classList.add('bump');
+      setTimeout(() => el.classList.remove('bump'), 500);
+    });
+  } catch (err) {
+    document.getElementById('add-msg').innerHTML = `<div class="error-msg">${err.message}</div>`;
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    btn.textContent = 'Add to Bag';
+  }
+}
+
+(async () => {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (!id) { window.location.href = '/pages/products.html'; return; }
+
+  try {
+    const { data } = await api.getProduct(id);
+    product = data;
+
+    document.title = `${data.name} — z_3CH`;
+    document.getElementById('breadcrumb-name').textContent = data.name;
+
+    // Color map
+    const colorMap = { White: '#f5f5f5', Black: '#1a1a1a', Stone: '#c8b99a', Navy: '#1a2744', Grey: '#888', Red: '#c44' };
+
+    document.getElementById('product-content').innerHTML = `
+      <div class="product-detail">
+        <!-- Gallery -->
+        <div class="product-gallery">
+          <div class="gallery-main">
+            <img id="main-img" src="${data.image}" alt="${data.name}">
+          </div>
+          <div class="gallery-thumbs">
+            ${(data.images?.length ? data.images : [data.image]).map((img, i) => `
+              <div class="gallery-thumb ${i === 0 ? 'active' : ''}" onclick="switchImage('${img}', this)">
+                <img src="${img}" alt="${data.name}">
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="product-detail-info">
+          <p class="product-category" style="margin-bottom:10px">${data.category}</p>
+          <h1 class="product-detail-name">${data.name}</h1>
+          <p class="product-detail-price"><strong>${fmt(data.price)}</strong></p>
+
+          <div class="detail-divider"></div>
+
+          ${data.description ? `<p class="product-description">${data.description}</p>` : ''}
+
+          <!-- Sizes -->
+          ${data.sizes?.length ? `
+          <div class="option-group">
+            <div class="option-label">
+              Size <span id="selected-size-label">${selectedSize || 'Select a size'}</span>
+            </div>
+            <div class="size-grid">
+              ${data.sizes.map(s => `
+                <button class="size-btn" onclick="selectSize('${s}', this); document.getElementById('selected-size-label').textContent='${s}'">${s}</button>
+              `).join('')}
+            </div>
+          </div>` : ''}
+
+          <!-- Colors -->
+          ${data.colors?.length ? `
+          <div class="option-group">
+            <div class="option-label">
+              Color <span id="selected-color-label">${data.colors[0]}</span>
+            </div>
+            <div class="color-grid">
+              ${data.colors.map((c, i) => `
+                <button
+                  class="color-btn ${i === 0 ? 'selected' : ''}"
+                  style="background:${colorMap[c] || '#ccc'}"
+                  title="${c}"
+                  onclick="selectColor('${c}', this); document.getElementById('selected-color-label').textContent='${c}'"
+                ></button>
+              `).join('')}
+            </div>
+          </div>` : ''}
+
+          <!-- Add to cart -->
+          <div class="add-to-cart-section">
+            <div id="add-msg"></div>
+            <button id="add-btn" class="btn btn-primary btn-full" onclick="addToCart()">
+              Add to Bag
+            </button>
+            <button class="btn btn-ghost btn-full">Save to Wishlist</button>
+          </div>
+
+          <div class="detail-divider"></div>
+
+          <!-- Details -->
+          ${data.details?.length ? `
+          <div>
+            <p class="label" style="margin-bottom:14px">Product Details</p>
+            <ul class="product-details-list">
+              ${data.details.map(d => `<li>${d}</li>`).join('')}
+            </ul>
+          </div>` : ''}
+
+          <div class="detail-divider"></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--warm-gray)">
+              <span>✦</span> Free shipping on orders over $100
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--warm-gray)">
+              <span>⟳</span> Free 30-day returns
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Pre-select first color
+    if (data.colors?.length) {
+      selectedColor = data.colors[0];
+    }
+
+  } catch (err) {
+    document.getElementById('product-content').innerHTML =
+      `<div style="text-align:center;padding:80px 20px">
+        <p style="color:var(--error);margin-bottom:20px">${err.message}</p>
+        <a href="/pages/products.html" class="btn btn-outline">Back to Shop</a>
+      </div>`;
+  }
+})();
+</script>
+</body>
+</html>

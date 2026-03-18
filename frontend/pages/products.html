@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop — z_3CH</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">z_3<span>CH</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/pages/products.html">Shop</a></li>
+    <li><a href="/pages/products.html?category=T-Shirts">T-Shirts</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="/pages/cart.html">
+      <button class="cart-btn">Bag <span class="cart-count">0</span></button>
+    </a>
+    <button class="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-nav">
+  <a href="/">Home</a>
+  <a href="/pages/products.html">Shop</a>
+  <a href="/pages/cart.html">Cart</a>
+</div>
+
+<main class="page">
+  <div class="container">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <a href="/">Home</a><span>/</span><span>Shop</span>
+      </div>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px">
+        <h1 class="display-md" id="page-title">All Products</h1>
+        <button class="btn btn-ghost" id="filter-toggle" style="display:none" onclick="toggleFilters()">
+          Filter & Sort
+        </button>
+      </div>
+    </div>
+
+    <div class="products-layout">
+      <!-- Filters -->
+      <aside class="filters-panel" id="filters-panel">
+        <div class="filter-group">
+          <h4>Category</h4>
+          <div class="filter-options" id="category-filters">
+            <button class="filter-chip active" data-cat="all" onclick="filterBy('all', this)">All</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <h4>Price</h4>
+          <div class="filter-options">
+            <button class="filter-chip" data-max="50" onclick="filterByPrice(50, this)">Under $50</button>
+            <button class="filter-chip" data-max="100" onclick="filterByPrice(100, this)">Under $100</button>
+            <button class="filter-chip" data-max="999" onclick="filterByPrice(999, this)">All Prices</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Products -->
+      <div>
+        <div class="products-header">
+          <p class="products-count" id="product-count">Loading…</p>
+          <select class="sort-select" id="sort-select" onchange="sortProducts()">
+            <option value="default">Sort: Featured</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name: A–Z</option>
+          </select>
+        </div>
+        <div class="products-grid" id="products-grid">
+          <!-- skeleton -->
+          <div class="product-card skeleton-card">
+            <div class="product-img-wrap"><div class="skeleton skeleton-img" style="height:360px"></div></div>
+            <div class="product-info">
+              <div class="skeleton skeleton-line" style="width:40%;height:12px;margin-bottom:8px"></div>
+              <div class="skeleton skeleton-line" style="width:80%;height:18px;margin-bottom:8px"></div>
+              <div class="skeleton skeleton-line" style="width:25%;height:14px"></div>
+            </div>
+          </div>
+          <div class="product-card skeleton-card">
+            <div class="product-img-wrap"><div class="skeleton skeleton-img" style="height:360px"></div></div>
+            <div class="product-info">
+              <div class="skeleton skeleton-line" style="width:40%;height:12px;margin-bottom:8px"></div>
+              <div class="skeleton skeleton-line" style="width:80%;height:18px;margin-bottom:8px"></div>
+              <div class="skeleton skeleton-line" style="width:25%;height:14px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="nav-logo">z_3<span style="color:var(--accent)">CH</span></span>
+      <p>Modern essentials for the considered wardrobe.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Shop</h5>
+      <a href="/pages/products.html">All Products</a>
+    </div>
+    <div class="footer-col"><h5>Help</h5><a href="#">Size Guide</a><a href="#">Returns</a></div>
+    <div class="footer-col"><h5>Company</h5><a href="/pages/admin.html">Admin</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2025 z_3CH.</span></div>
+</footer>
+
+<script src="/js/main.js"></script>
+<script>
+let allProducts = [];
+let filtered = [];
+let activeCategory = 'all';
+let maxPrice = 999;
+
+function toggleFilters() {
+  document.getElementById('filters-panel').classList.toggle('open');
+}
+
+function renderProducts(list) {
+  const grid = document.getElementById('products-grid');
+  document.getElementById('product-count').textContent = `${list.length} product${list.length !== 1 ? 's' : ''}`;
+  grid.innerHTML = list.length
+    ? list.map(productCardHTML).join('')
+    : '<p style="color:var(--warm-gray);grid-column:1/-1">No products found.</p>';
+}
+
+function applyFilters() {
+  filtered = allProducts.filter(p =>
+    (activeCategory === 'all' || p.category === activeCategory) && p.price <= maxPrice
+  );
+  sortProducts();
+}
+
+function filterBy(cat, btn) {
+  activeCategory = cat;
+  document.querySelectorAll('[data-cat]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function filterByPrice(max, btn) {
+  maxPrice = max;
+  document.querySelectorAll('[data-max]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function sortProducts() {
+  const val = document.getElementById('sort-select').value;
+  const sorted = [...filtered];
+  if (val === 'price-asc') sorted.sort((a, b) => a.price - b.price);
+  else if (val === 'price-desc') sorted.sort((a, b) => b.price - a.price);
+  else if (val === 'name-asc') sorted.sort((a, b) => a.name.localeCompare(b.name));
+  renderProducts(sorted);
+}
+
+(async () => {
+  // Check for URL category param
+  const params = new URLSearchParams(window.location.search);
+  const catParam = params.get('category');
+
+  try {
+    const { data } = await api.getProducts();
+    allProducts = data;
+
+    // Build category filters
+    const cats = [...new Set(data.map(p => p.category))];
+    const cf = document.getElementById('category-filters');
+    cf.innerHTML = `<button class="filter-chip ${!catParam ? 'active' : ''}" data-cat="all" onclick="filterBy('all', this)">All</button>`;
+    cats.forEach(c => {
+      cf.innerHTML += `<button class="filter-chip ${catParam === c ? 'active' : ''}" data-cat="${c}" onclick="filterBy('${c}', this)">${c}</button>`;
+    });
+
+    if (catParam) {
+      activeCategory = catParam;
+      document.getElementById('page-title').textContent = catParam;
+      document.querySelector('.breadcrumb').innerHTML +=
+        `<span>/</span><span>${catParam}</span>`;
+    }
+
+    applyFilters();
+  } catch (err) {
+    document.getElementById('products-grid').innerHTML =
+      `<p style="color:var(--error);grid-column:1/-1">Could not load products: ${err.message}</p>`;
+    document.getElementById('product-count').textContent = '0 products';
+  }
+})();
+</script>
+</body>
+</html>

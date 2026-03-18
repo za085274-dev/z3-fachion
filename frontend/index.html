@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Z_3 Fachion</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- ── NAV ───────────────────────────────────────── -->
+<nav class="nav">
+  <a href="/" style="text-decoration:none;display:flex;align-items:center">
+ 
+    <svg width="120" height="40" viewBox="0 0 120 40">
+    <rect width="120" height="40" rx="4" fill="#0a0a0a"/>
+    <text x="10" y="26" font-family="sans-serif" font-size="18" font-weight="bold" fill="white">Z3</text>
+    <text x="42" y="26" font-family="sans-serif" font-size="11" fill="#b8924a" letter-spacing="2">FACHION</text>
+  </svg>
+</a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/pages/products.html">Shop</a></li>
+    <li><a href="/pages/products.html?category=T-Shirts">T-Shirts</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="/pages/cart.html">
+      <button class="cart-btn">
+        Bag <span class="cart-count">0</span>
+      </button>
+    </a>
+    <button class="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="mobile-nav">
+  <a href="/">Home</a>
+  <a href="/pages/products.html">Shop</a>
+  <a href="/pages/cart.html">Cart</a>
+</div>
+
+<!-- ── HERO ──────────────────────────────────────── -->
+<main class="page">
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">New Collection — 2025</p>
+      <h1 class="display-xl hero-title">
+        Wear<br><em>Less.</em><br>Say<br>More.
+      </h1>
+      <p class="hero-sub">
+        Essentials refined to their purest form. Each piece designed to outlast trends and outlive seasons.
+      </p>
+      <div class="hero-ctas">
+        <a href="/pages/products.html" class="btn btn-primary">Shop the Collection</a>
+        <a href="/pages/products.html" class="btn btn-outline">Explore All</a>
+      </div>
+    </div>
+    <div class="hero-img">
+      <img
+      src="https://t4.ftcdn.net/jpg/01/01/25/51/360_F_101255187_duUki78zBfLq9O990fMiqwm618u48pqc.jpg"
+      alt="Hero model"
+      >
+      <div class="hero-img-overlay">
+        <p class="label">Featured Piece</p>
+        <p>Essential White Tee — $45</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MARQUEE ────────────────────────────────── -->
+  <div class="marquee-strip">
+    <div class="marquee-track" id="marquee">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+
+  <!-- ── FEATURES ───────────────────────────────── -->
+  <div class="features-strip">
+    <div class="feature-item">
+      <div class="feature-icon">✦</div>
+      <div>
+        <div class="feature-title">Free Shipping</div>
+        <div class="feature-desc">On all orders over $100</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">⟳</div>
+      <div>
+        <div class="feature-title">30-Day Returns</div>
+        <div class="feature-desc">Hassle-free returns &amp; exchanges</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">◈</div>
+      <div>
+        <div class="feature-title">Sustainably Made</div>
+        <div class="feature-desc">Organic & recycled materials</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">◎</div>
+      <div>
+        <div class="feature-title">Expert Fit</div>
+        <div class="feature-desc">Tailored for every body type</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FEATURED PRODUCTS ──────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:40px">
+        <div>
+          <p class="label" style="margin-bottom:8px">Curated Picks</p>
+          <h2 class="display-md">Featured Pieces</h2>
+        </div>
+        <a href="/pages/products.html" class="btn btn-ghost">View All</a>
+      </div>
+      <div class="products-grid" id="featured-products">
+        <!-- skeleton -->
+        <div class="product-card skeleton-card">
+          <div class="product-img-wrap"><div class="skeleton skeleton-img" style="height:360px"></div></div>
+          <div class="product-info">
+            <div class="skeleton skeleton-line" style="width:40%;height:12px;margin-bottom:8px"></div>
+            <div class="skeleton skeleton-line" style="width:80%;height:18px;margin-bottom:8px"></div>
+            <div class="skeleton skeleton-line" style="width:25%;height:14px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── EDITORIAL BANNER ───────────────────────── -->
+  <section style="background:var(--ink);color:var(--cream);padding:80px var(--gutter);text-align:center">
+    <p class="label" style="color:var(--accent);margin-bottom:16px">The z_3 FACHION Philosophy</p>
+    <h2 class="display-lg" style="max-width:640px;margin:0 auto 24px;font-style:italic">
+      "Quality over quantity. Always."
+    </h2>
+    <p style="color:rgba(245,242,237,0.6);max-width:440px;margin:0 auto 36px;font-size:15px;line-height:1.8">
+      We make fewer pieces, but we make them better. Every fabric is chosen with intention. Every z_3 FACHION placed with care.
+    </p>
+    <a href="/pages/products.html" class="btn btn-outline" style="color:var(--cream);border-color:var(--cream)">
+      Explore the Collection
+    </a>
+  </section>
+</main>
+
+<!-- ── FOOTER ─────────────────────────────────────── -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="nav-logo">Z3 Fachion<span style="color:var(--accent)">CH</span></span>
+      <p>Modern essentials for the considered wardrobe. Designed to last, made to be worn.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Shop</h5>
+      <a href="/pages/products.html">All Products</a>
+      <a href="/pages/products.html?category=T-Shirts">T-Shirts</a>
+    </div>
+    <div class="footer-col">
+      <h5>Help</h5>
+      <a href="#">Size Guide</a>
+      <a href="#">Shipping</a>
+      <a href="#">Returns</a>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <a href="#">About</a>
+      <a href="#">Sustainability</a>
+      <a href="/pages/admin.html">Admin</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 z_3 FACHION. All rights reserved.</span>
+    <span>Made with intention.</span>
+  </div>
+</footer>
+
+<script src="/js/main.js"></script>
+<script>
+(async () => {
+  // Marquee
+  const items = ['New Arrivals', 'Free Shipping Over $100', 'Sustainably Made', 'Organic Cotton', 'Timeless Design', 'Est. 2025'];
+  const doubled = [...items, ...items];
+  document.getElementById('marquee').innerHTML = doubled.map(t =>
+    `<span class="marquee-item">${t}<span class="marquee-dot">✦</span></span>`
+  ).join('');
+
+  // Featured products
+  try {
+    const { data } = await api.getProducts('?featured=true');
+    const grid = document.getElementById('featured-products');
+    if (data.length === 0) {
+      grid.innerHTML = '<p style="color:var(--warm-gray)">No featured products yet.</p>';
+    } else {
+      grid.innerHTML = data.map(productCardHTML).join('');
+    }
+  } catch (err) {
+    document.getElementById('featured-products').innerHTML =
+      '<p style="color:var(--error)">Could not load products.</p>';
+  }
+})();
+</script>
+</body>
+</html>
