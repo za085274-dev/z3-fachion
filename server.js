@@ -200,17 +200,13 @@ app.delete("/api/cart", (req, res) => {
 app.post("/api/checkout", async (req, res) => {
   try {
     let receiptUrl = null;
-
-    // 1. رفع الصورة لـ Cloudinary لو موجودة
     if (req.body.receipt) {
       try {
         const uploaded = await cloudinary.uploader.upload(req.body.receipt, {
           folder: 'z3-fachion/receipts'
         });
         receiptUrl = uploaded.secure_url;
-      } catch(e) {
-        console.error('Cloudinary upload failed:', e);
-      }
+      } catch(e) { console.error('Cloudinary upload failed:', e); }
     }
 
     const { name, email, address } = req.body;
@@ -223,13 +219,20 @@ app.post("/api/checkout", async (req, res) => {
       return res.status(400).json({ success: false, message: "Cart is empty" });
     }
 
-    // 2. إنشاء الطلب (مرة واحدة بس بـ ID واحد)
+    // ─── الجزء اللي بيخلي المنتج Sold Out ───
+    db.cart.forEach(cartItem => {
+      const product = db.products.find(p => p.id === cartItem.productId);
+      if (product) {
+        // خصم الكمية من المخزون
+        product.stock = Math.max(0, product.stock - cartItem.quantity);
+      }
+    });
+    // ───────────────────────────────────────
+
     const orderId = "ORD-" + uuidv4().slice(0, 8).toUpperCase();
     const newOrder = {
       orderId,
-      name,
-      email,
-      address,
+      name, email, address,
       items: [...db.cart],
       total: db.cart.reduce((s, i) => s + i.price * i.quantity, 0),
       date: new Date().toISOString(),
@@ -240,9 +243,8 @@ app.post("/api/checkout", async (req, res) => {
     if (!db.orders) db.orders = [];
     db.orders.unshift(newOrder);
     
-    // 3. مسح السلة وحفظ البيانات
     db.cart = [];
-    writeDB(db);
+    writeDB(db); // حفظ المخزون الجديد والطلب في ملف db.json
 
     res.json({ success: true, data: { orderId, message: "Order placed successfully!" } });
   } catch (err) {
