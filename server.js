@@ -283,6 +283,27 @@ app.put("/api/admin/orders/:id", (req, res) => {
     res.status(500).json({ success: false, message: "Failed to update order" });
   }
 }); 
+// ── Admin: Update order status to Shipped ──────────────────────────────────
+app.put("/api/admin/orders/:id/ship", (req, res) => {
+  try {
+    const db = readDB();
+    // بندور على الطلب بالـ ID اللي جاي من الـ Frontend
+    const orderIdx = db.orders.findIndex(o => o.orderId === req.params.id);
+    
+    if (orderIdx === -1) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    // بنغير الحالة لـ shipped
+    db.orders[orderIdx].status = "shipped";
+    
+    writeDB(db);
+    res.json({ success: true, message: "Order marked as shipped" });
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).json({ success: false, message: "Failed to update order" });
+  }
+});
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "index.html"));
 });
