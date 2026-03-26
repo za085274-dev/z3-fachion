@@ -259,7 +259,30 @@ app.post("/api/checkout", async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, message: "Failed to fetch orders" });
   }
-});    
+});   
+// ── Admin: Update order status ──────────────────────────────────────────────
+app.put("/api/admin/orders/:id", (req, res) => {
+  try {
+    const { status } = req.body;
+    const db = readDB();
+    
+    // البحث عن الطلب بالـ ID
+    const orderIdx = db.orders.findIndex(o => o.orderId === req.params.id);
+    
+    if (orderIdx === -1) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    // تحديث الحالة (مثلاً من pending لـ shipped)
+    db.orders[orderIdx].status = status || "shipped";
+    
+    writeDB(db);
+    res.json({ success: true, message: "Order status updated", data: db.orders[orderIdx] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Failed to update order" });
+  }
+}); 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "index.html"));
 });
