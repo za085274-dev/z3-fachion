@@ -213,7 +213,7 @@ async function loadOrders() {
     const res = await fetch('/api/admin/orders');
     const { data } = await res.json();
     const list = document.getElementById('orders-list');
-    document.getElementById('orders-count').textContent = `(${data.length})`;
+    
     if (!data || data.length === 0) {
       list.innerHTML = '<p style="color:var(--warm-gray)">مفيش طلبات لسه.</p>';
       return;
@@ -245,7 +245,7 @@ async function markShipped(orderId) {
   } catch(e) {
     alert('حصل خطأ');
   }
-}تم
+}
 loadOrders();
 </script>
 </body>
