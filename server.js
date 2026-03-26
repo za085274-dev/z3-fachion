@@ -196,56 +196,57 @@ app.delete("/api/cart", (req, res) => {
 });
 
 // ── Checkout ─────────────────────────────────────────────────────────────────
+// ── Checkout ─────────────────────────────────────────────────────────────────
 app.post("/api/checkout", async (req, res) => {
   try {
     let receiptUrl = null;
-if (req.body.receipt) {
-  try {
-    const uploaded = await cloudinary.uploader.upload(req.body.receipt, {
-      folder: 'z3-fachion/receipts'
-    });
-    receiptUrl = uploaded.secure_url;
-  } catch(e) {
-    console.error('Cloudinary upload failed:', e);
-  }
-}
-    const { name, email, address, city, zip, country, cardNumber } = req.body;
+
+    // 1. رفع الصورة لـ Cloudinary لو موجودة
+    if (req.body.receipt) {
+      try {
+        const uploaded = await cloudinary.uploader.upload(req.body.receipt, {
+          folder: 'z3-fachion/receipts'
+        });
+        receiptUrl = uploaded.secure_url;
+      } catch(e) {
+        console.error('Cloudinary upload failed:', e);
+      }
+    }
+
+    const { name, email, address } = req.body;
     if (!name || !email || !address) {
       return res.status(400).json({ success: false, message: "Missing required fields" });
     }
+
     const db = readDB();
-    if (db.cart.length === 0) {
+    if (!db.cart || db.cart.length === 0) {
       return res.status(400).json({ success: false, message: "Cart is empty" });
     }
+
+    // 2. إنشاء الطلب (مرة واحدة بس بـ ID واحد)
     const orderId = "ORD-" + uuidv4().slice(0, 8).toUpperCase();
-    if (!db.orders) db.orders = [];
-    db.orders.unshift({
+    const newOrder = {
       orderId,
-      name: req.body.name,
-      email: req.body.email,
-      address: req.body.address,
-      items: db.cart,
+      name,
+      email,
+      address,
+      items: [...db.cart],
       total: db.cart.reduce((s, i) => s + i.price * i.quantity, 0),
       date: new Date().toISOString(),
       status: "pending",
-receipt: receiptUrl
-    });
-    const order = {
-      orderId,
-      name: req.body.name,
-      email: req.body.email,
-      address: req.body.address,
-      items: db.cart,
-      total: db.cart.reduce((s, i) => s + i.price * i.quantity, 0),
-      date: new Date().toISOString(),
-      status: "pending"
+      receipt: receiptUrl
     };
+
     if (!db.orders) db.orders = [];
-    db.orders.unshift(order);
+    db.orders.unshift(newOrder);
+    
+    // 3. مسح السلة وحفظ البيانات
     db.cart = [];
     writeDB(db);
+
     res.json({ success: true, data: { orderId, message: "Order placed successfully!" } });
   } catch (err) {
+    console.error("Checkout error:", err);
     res.status(500).json({ success: false, message: "Checkout failed" });
   }
 });
