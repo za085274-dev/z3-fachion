@@ -63,7 +63,7 @@
       >
       <div class="hero-img-overlay">
         <p class="label">Featured Piece</p>
-        <p>Essential White Tee — $45</p>
+        <p>Essential White Tee — EGP45</p>
       </div>
     </div>
   </section>
@@ -81,7 +81,7 @@
       <div class="feature-icon">✦</div>
       <div>
         <div class="feature-title">Free Shipping</div>
-        <div class="feature-desc">On all orders over $100</div>
+        <div class="feature-desc">On all orders over EGP100</div>
       </div>
     </div>
     <div class="feature-item">
@@ -181,10 +181,10 @@
 <script>
 (async () => {
   // Marquee
-  const items = ['New Arrivals', 'Free Shipping Over $100', 'Sustainably Made', 'Organic Cotton', 'Timeless Design', 'Est. 2025'];
+  const items = ['New Arrivals', 'Free Shipping Over EGP100', 'Sustainably Made', 'Organic Cotton', 'Timeless Design', 'Est. 2025'];
   const doubled = [...items, ...items];
   document.getElementById('marquee').innerHTML = doubled.map(t =>
-    `<span class="marquee-item">${t}<span class="marquee-dot">✦</span></span>`
+    `<span class="marquee-item">EGP{t}<span class="marquee-dot">✦</span></span>`
   ).join('');
 
   // Featured products

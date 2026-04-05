@@ -54,6 +54,18 @@ ul, ol { list-style: none; }
 /* ── Selection ────────────────────────────────── */
 ::selection { background: var(--accent); color: var(--white); }
 
+
+.price {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.price::after {
+    content: " EGP";
+    font-size: 14px; /* حجم أصغر للعملة */
+    color: #888;     /* لون رمادي خفيف */
+    margin-left: 5px;
+}
 /* ═══════════════════════════════════════════════
    NAV
    ═══════════════════════════════════════════════ */
