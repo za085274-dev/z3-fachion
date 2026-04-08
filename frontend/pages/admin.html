@@ -19,14 +19,12 @@
   </a>
 </div>
 
-<div class="admin-wrap" id="admin-wrap" style="display:none">
+<div id="admin-wrap" style="display:none">
+<div class="admin-wrap">
   <div class="admin-layout">
-
-    <!-- Add Product Form -->
     <div class="admin-form">
       <h2>Add New Product</h2>
       <div id="admin-msg" style="margin-bottom:16px"></div>
-
       <div style="display:flex;flex-direction:column;gap:14px">
         <div class="form-group">
           <label>Product Name *</label>
@@ -34,7 +32,7 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Price ($) *</label>
+            <label>Price *</label>
             <input type="number" id="a-price" placeholder="89.00" min="0" step="0.01">
           </div>
           <div class="form-group">
@@ -81,16 +79,27 @@
       </div>
     </div>
 
-    <!-- Product List -->
     <div class="admin-products">
       <h2>Current Products</h2>
       <div id="admin-product-list">
         <div class="loading-overlay"><div class="spinner"></div></div>
       </div>
     </div>
-
   </div>
+
+  <!-- Orders Section -->
+  <div style="margin-top:48px">
+    <h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;margin-bottom:24px">
+      الطلبات <span id="orders-count" style="font-size:16px;color:var(--accent)"></span>
+    </h2>
+    <div id="orders-list">
+      <div class="loading-overlay"><div class="spinner"></div></div>
+    </div>
+  </div>
+
 </div>
+</div>
+
 <script>
 const pass = prompt('ادخل الباسورد:');
 if (pass === '3bradi22') {
@@ -99,6 +108,7 @@ if (pass === '3bradi22') {
   document.body.innerHTML = '<div style="text-align:center;padding:100px;font-family:sans-serif"><h2>غير مصرح لك بالدخول</h2><a href="/">الرجوع للموقع</a></div>';
 }
 </script>
+
 <script src="/js/main.js"></script>
 <script>
 async function loadAdminProducts() {
@@ -127,20 +137,19 @@ async function loadAdminProducts() {
 }
 
 async function addProduct() {
-  const name     = document.getElementById('a-name').value.trim();
-  const price    = document.getElementById('a-price').value;
+  const name = document.getElementById('a-name').value.trim();
+  const price = document.getElementById('a-price').value;
   const category = document.getElementById('a-category').value.trim();
-  const desc     = document.getElementById('a-desc').value.trim();
-  const image    = document.getElementById('a-image').value.trim();
+  const desc = document.getElementById('a-desc').value.trim();
+  const image = document.getElementById('a-image').value.trim();
   const sizesRaw = document.getElementById('a-sizes').value;
-  const colorsRaw= document.getElementById('a-colors').value;
+  const colorsRaw = document.getElementById('a-colors').value;
   const detailsRaw = document.getElementById('a-details').value;
-  const stock    = document.getElementById('a-stock').value;
+  const stock = document.getElementById('a-stock').value;
   const featured = document.getElementById('a-featured').checked;
 
   if (!name || !price || !category) {
-    document.getElementById('admin-msg').innerHTML =
-      '<div class="error-msg">Name, price and category are required.</div>';
+    document.getElementById('admin-msg').innerHTML = '<div class="error-msg">Name, price and category are required.</div>';
     return;
   }
 
@@ -160,9 +169,7 @@ async function addProduct() {
         featured,
       })
     });
-    document.getElementById('admin-msg').innerHTML =
-      '<div class="success-msg">✓ Product added successfully!</div>';
-    // Clear form
+    document.getElementById('admin-msg').innerHTML = '<div class="success-msg">✓ Product added successfully!</div>';
     ['a-name','a-price','a-category','a-desc','a-image','a-colors','a-details'].forEach(id => {
       document.getElementById(id).value = '';
     });
@@ -172,10 +179,8 @@ async function addProduct() {
     loadAdminProducts();
     setTimeout(() => document.getElementById('admin-msg').innerHTML = '', 4000);
   } catch (err) {
-    document.getElementById('admin-msg').innerHTML =
-      `<div class="error-msg">${err.message}</div>`;
+    document.getElementById('admin-msg').innerHTML = `<div class="error-msg">${err.message}</div>`;
   }
-
   btn.disabled = false; btn.textContent = 'Add Product';
 }
 
@@ -192,28 +197,17 @@ async function deleteProduct(id, btn) {
   }
 }
 
-// Expose apiFetch globally for admin page
 function apiFetch(path, opts = {}) {
   return fetch('/api' + path, { headers: { 'Content-Type': 'application/json' }, ...opts })
     .then(r => r.json().then(d => { if (!r.ok) throw new Error(d.message); return d; }));
 }
 
-loadAdminProducts();
-</script>
-<div style="max-width:1200px;margin:40px auto;padding:0 20px">
-<h2 style="font-family:var(--font-display);font-size:26px;font-weight:300;margin-bottom:24px">الطلبات <span id="orders-count" style="font-size:16px;color:var(--accent)"></span></h2>
-  <div id="orders-list">
-    <div class="loading-overlay"><div class="spinner"></div></div>
-  </div>
-</div>
-
-<script>
 async function loadOrders() {
   try {
     const res = await fetch('/api/admin/orders');
     const { data } = await res.json();
     const list = document.getElementById('orders-list');
-    
+    document.getElementById('orders-count').textContent = `(${data.length})`;
     if (!data || data.length === 0) {
       list.innerHTML = '<p style="color:var(--warm-gray)">مفيش طلبات لسه.</p>';
       return;
@@ -229,15 +223,21 @@ async function loadOrders() {
         <div style="font-size:14px;margin-bottom:8px"><strong>الإجمالي:</strong> ${o.total} جنيه</div>
         <div style="font-size:13px;color:var(--warm-gray)">
           ${o.items.map(i => `${i.name} × ${i.quantity}`).join(' — ')}
-          <div style="margin-top:12px"><span style="font-size:12px;padding:4px 12px;background:${o.status==='shipped'?'#2d7a4f':'#e8a020'};color:white">${o.status==='shipped'?'✓ تم الشحن':'⏳ قيد الانتظار'}</span> ${o.status!=='shipped'?`<button onclick="markShipped('${o.orderId}')" style="font-size:11px;padding:4px 12px;border:1px solid #2d7a4f;color:#2d7a4f;background:none;cursor:pointer">تحديد كمشحون</button>`:''}</div>
-${o.receipt ? `<div style="margin-top:12px"><p style="font-size:12px;color:var(--warm-gray);margin-bottom:6px">إيصال التحويل:</p><img src="${o.receipt}" style="max-width:200px;max-height:200px;object-fit:contain;border:1px solid var(--light-gray)"></div>` : ''}
         </div>
+        <div style="margin-top:12px">
+          <span style="font-size:12px;padding:4px 12px;background:${o.status==='shipped'?'#2d7a4f':'#e8a020'};color:white">
+            ${o.status==='shipped'?'✓ تم الشحن':'⏳ قيد الانتظار'}
+          </span>
+          ${o.status!=='shipped'?`<button onclick="markShipped('${o.orderId}')" style="font-size:11px;padding:4px 12px;border:1px solid #2d7a4f;color:#2d7a4f;background:none;cursor:pointer;margin-left:8px">تحديد كمشحون</button>`:''}
+        </div>
+        ${o.receipt?`<div style="margin-top:12px"><p style="font-size:12px;color:var(--warm-gray);margin-bottom:6px">إيصال التحويل:</p><img src="${o.receipt}" style="max-width:200px;max-height:200px;object-fit:contain;border:1px solid var(--light-gray)"></div>`:''}
       </div>
     `).join('');
   } catch(err) {
     document.getElementById('orders-list').innerHTML = '<p style="color:var(--error)">حصل خطأ</p>';
   }
 }
+
 async function markShipped(orderId) {
   try {
     await fetch(`/api/admin/orders/${orderId}/ship`, { method: 'PUT' });
@@ -246,6 +246,8 @@ async function markShipped(orderId) {
     alert('حصل خطأ');
   }
 }
+
+loadAdminProducts();
 loadOrders();
 </script>
 </body>
