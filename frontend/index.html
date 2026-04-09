@@ -1,22 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Syne:wght@400;800&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Z_3 Fachion</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-<div class="future-grid"></div>
+
 <!-- ── NAV ───────────────────────────────────────── -->
-<nav class="glass-nav">
-    <div class="logo">Z_3 FACHION</div>
-    <ul class="nav-links">
-        <li><a href="/">الرئيسية</a></li>
-        <li><a href="/pages/products.html">المتجر</a></li>
-        <li><a href="/pages/cart.html">السلة</a></li>
-    </ul>
+<nav class="nav">
+  <a href="/" style="text-decoration:none;display:flex;align-items:center">
+ 
+    <svg width="120" height="40" viewBox="0 0 120 40">
+    <rect width="120" height="40" rx="4" fill="#0a0a0a"/>
+    <text x="10" y="26" font-family="sans-serif" font-size="18" font-weight="bold" fill="white">Z3</text>
+    <text x="42" y="26" font-family="sans-serif" font-size="11" fill="#b8924a" letter-spacing="2">FACHION</text>
+  </svg>
+</a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/pages/products.html">Shop</a></li>
+    <li><a href="/pages/products.html?category=T-Shirts">T-Shirts</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="/pages/cart.html">
+      <button class="cart-btn">
+        Bag <span class="cart-count">0</span>
+      </button>
+    </a>
+    <button class="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </nav>
 <div class="mobile-nav">
   <a href="/">Home</a>
@@ -26,20 +42,7 @@
 
 <!-- ── HERO ──────────────────────────────────────── -->
 <main class="page">
-<section class="hero">
-    <div class="hero-content">
-        <h1 class="glitch-text" data-text="Z_3 FACHION">Z_3 FACHION</h1>
-        
-        <p class="hero-sub">REDEFINING THE ESSENTIALS // NEXT GEN</p>
-        
-        <div class="hero-btns">
-            <button class="cta-button">SHOP THE FUTURE</button>
-            <button class="cta-button secondary">DISCOVER MORE</button>
-        </div>
-    </div>
-</section>
-<!--
-    <section class="hero">
+  <section class="hero">
     <div class="hero-content">
       <p class="hero-eyebrow">New Collection — 2025</p>
       <h1 class="display-xl hero-title">
@@ -63,7 +66,8 @@
         <p>Essential White Tee — EGP45</p>
       </div>
     </div>
-  </section>-->
+  </section>
+
   <!-- ── MARQUEE ────────────────────────────────── -->
   <div class="marquee-strip">
     <div class="marquee-track" id="marquee">
@@ -164,7 +168,7 @@
       <h5>Company</h5>
       <a href="#">About</a>
       <a href="#">Sustainability</a>
-     <!--<a href="/pages/admin.html">Admin</a>--> 
+      <a href="/pages/admin.html">Admin</a>
     </div>
   </div>
   <div class="footer-bottom">
@@ -197,24 +201,6 @@
       '<p style="color:var(--error)">Could not load products.</p>';
   }
 })();
-</script>
-<script>
-    // ده بيخلي المنتجات تظهر بـ Fade-in لما تنزل لها بالسكرول
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = "1";
-                entry.target.style.transform = "translateY(0)";
-            }
-        });
-    });
-
-    document.querySelectorAll('.product-card').forEach(card => {
-        card.style.opacity = "0";
-        card.style.transform = "translateY(50px)";
-        card.style.transition = "all 0.8s ease-out";
-        observer.observe(card);
-    });
 </script>
 </body>
 </html>
